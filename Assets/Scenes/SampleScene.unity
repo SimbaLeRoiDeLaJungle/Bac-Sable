@@ -240,7 +240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
-  jumpSpeed: 4
+  jumpSpeed: 10
 --- !u!50 &1480141914
 Rigidbody2D:
   serializedVersion: 4
@@ -358,7 +358,7 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 64
-  rayLength: 0.1
+  rayLength: 0.15
 --- !u!1 &2018096414
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Simba
 {
-   //MonoBehaviour == C'est une classe qui peut s'attacher aux "GameObjects" ici le gameObject est le Player, on dit aussi que PlayerController est un "component" de Player. 
+    //MonoBehaviour == C'est une classe qui peut s'attacher aux "GameObjects" ici le gameObject est le Player, on dit aussi que PlayerController est un "component" de Player. 
+    // Implémente le saut et les mouvement lattéraux avec une physique réaliste de la forme F = -m.g.Vector3.up 
     public class PlayerController : MonoBehaviour
     {
         Rigidbody2D rb;
@@ -43,12 +44,13 @@ namespace Simba
             Vector3 dF = Vector3.zero;
             float conversionFactor = 500f; // pour que l'on es pas besoin de mettre des chiffre trop grand en vitesse
             if(x>0){
-                dF = Vector3.right * speed * dt * conversionFactor ;
+                dF = Vector3.right * speed * dt * conversionFactor ; // dF = da = accleration(t + dt) - acceleration(t) = vitesse * dt (masse = 1)
             }
             else if(x<0){
                 dF += Vector3.left * speed * dt * conversionFactor ;
             }
             if(y > 0){
+                // ici c'est la classe que j'ai crée dans l'autre fichier pour checker si le joueur touche le sol ou pas
                 bool isGrounded = groundChecker.CheckGroundContact();
                 if(isGrounded){
                     dF += Vector3.up * jumpSpeed * dt *conversionFactor ;
