@@ -13,6 +13,10 @@ namespace Simba{
         bool isCharging;
         [SerializeField] GfxUpdater gfx;
         Timer chargeTimer;
+        bool direction;
+        AttackHitBox attackHitBox;
+        public bool Direction{ get { return direction; } }
+
         void Start()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -23,6 +27,7 @@ namespace Simba{
             if(groundChecker == null){
                 Debug.Log("error : GroundChecker missing.");
             }
+            attackHitBox = GetComponent<AttackHitBox>();
             chargeTimer = new Timer(2,TimerMode.LOCK);
         }
 
@@ -55,13 +60,27 @@ namespace Simba{
             else{
                 if(isAttacking || isCharging){
                     rb.velocity = rb.velocity.y * Vector3.up;
+                    if(isAttacking){
+                        var hit = attackHitBox.TouchEnemy(direction);
+                        if(hit.collider != null){
+                            EnemyController ec = hit.collider.gameObject.GetComponent<EnemyController>();
+                            float power = 1f + (chargeTimer.Time/chargeTimer.MaxTime)*0.5f;
+                            ec.TakeHit(power, direction);
+                        }
+                    }
                 }
                 else{
 
                     //mvt latéraux
                     float latVelocity = axesInput.x * speed;
                     rb.velocity = latVelocity * Vector3.right + rb.velocity.y * Vector3.up;
-
+                    //set la variable direction
+                    if(axesInput.x > 0){
+                        direction = true;
+                    }
+                    else if(axesInput.x < 0){
+                        direction = false;
+                    }
                     //saut 
                     Vector3 dF = Vector3.zero;
                     if(axesInput.y > 0 && isGrounded){

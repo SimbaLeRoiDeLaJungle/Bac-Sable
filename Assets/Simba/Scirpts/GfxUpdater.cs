@@ -8,7 +8,7 @@ namespace Simba{
         Animator animator;
         void Start()
         {
-        animator = GetComponent<Animator>();
+            animator = GetComponent<Animator>();
         }
 
         public void UpdateGfx(bool isGrounded, float xVel, bool attack,bool isCharging, Timer chargeTimer, ref bool isAttacking){
