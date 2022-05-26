@@ -15,33 +15,13 @@ namespace Simba{
 
         void Update(){
             bool isGrounded = groundChecker.CheckGroundContact();
-            float absX = Mathf.Abs(rb.velocity.x);
-            bool walk = isGrounded && absX > 0;
+            float xvel = rb.velocity.x;
+            bool walk = isGrounded && xvel != 0 ; // la vitesse sur l'axe x n'est pas 0 et on est au sol => le joueur marche
             animator.SetBool("walk", walk);
-            if(absX > 0){
-                bool direction = rb.velocity.x > 0 ;
-                animator.SetBool("direction", direction);// true <=> right, false <=> left
+            if(xvel != 0){
+                bool direction = rb.velocity.x > 0 ; // si la vitesse est positive il marche vers la droite : true <=> right, false <=> left
+                animator.SetBool("direction", direction);
             }
-            /*         
-            En moin condensée c'est ça :
-            if(isGrounded){
-                if(rb.velocity.x > 0){
-                    animator.SetBool("walk", true);
-                    animator.SetBool("direction", true);// true <=> right, false <=> left
-                }
-                else if(rb.velocity.x<0){
-                    animator.SetBool("walk", true);
-                    animator.SetBool("direction", false);
-                }
-                else{
-                    animator.SetBool("walk", false);
-                }
-            }
-            else{
-                animator.SetBool("walk", false);
-                animator.SetBool()
-            } 
-            */
             // juste pour test 
             if(Input.GetKeyDown(KeyCode.Space)){
                 animator.SetTrigger("attack");
