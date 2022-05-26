@@ -27,6 +27,14 @@ namespace Simba{
             Debug.DrawLine(playerBottom, playerBottom + Vector3.down*rayLength, Color.green); // Pour voir le raycast en débug, un petit très vert doit apparaitre en dessous du joueur quand vous appuyer sur "haut".
             return hit.collider != null;
         }
+
+        public bool CanJump() {
+            Vector3 playerCenter = transform.position; // (transform est attaché par default au monoBehaviour. Il donne la position, rotation, ... du gameObject)
+            Vector3 playerBottom = playerCenter - Vector3.up * playerSize;  
+            var hit = Physics2D.Raycast(playerBottom, Vector3.down, rayLength/2, groundLayers); // https://docs.unity3d.com/ScriptReference/Physics2D.Raycast.html
+            Debug.DrawLine(playerBottom, playerBottom + Vector3.down*rayLength/2, Color.red); // Pour voir le raycast en débug, un petit très vert doit apparaitre en dessous du joueur quand vous appuyer sur "haut".
+            return hit.collider != null;
+        }
     }
 
 }
