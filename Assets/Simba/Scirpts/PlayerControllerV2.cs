@@ -10,8 +10,9 @@ namespace Simba{
         [SerializeField] float jumpSpeed;
         GroundChecker groundChecker;
         bool isAttacking;
+        bool isCharging;
         [SerializeField] GfxUpdater gfx;
-        
+        Timer chargeTimer;
         void Start()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -22,42 +23,56 @@ namespace Simba{
             if(groundChecker == null){
                 Debug.Log("error : GroundChecker missing.");
             }
+            chargeTimer = new Timer(2,TimerMode.LOCK);
         }
 
         void FixedUpdate() {
             float dt = Time.fixedDeltaTime; // temps entre 2 fixedUpdate
-            float x = Input.GetAxisRaw("Horizontal");
-            float y = Input.GetAxisRaw("Vertical");
-            bool attackInput = Input.GetKeyDown(KeyCode.Space);
+
+            //récupère les inputs
+            Vector2 axesInput = InputHandler.GetAxesInput();
+            bool spacePressed = InputHandler.KeyPressed(KeyCode.Space); // charge l'attaque
+            bool spaceRelease = InputHandler.KeyRelease(KeyCode.Space); // lance l'attaque
+            bool spaceDown = InputHandler.KeyDown(KeyCode.Space);
+
             bool isGrounded = groundChecker.CheckGroundContact();
-            
+
             bool attackLaunch = false;
-            if(attackInput){
-                if(!isAttacking){
-                    attackLaunch = true;
-                }
+            if(spacePressed){
+                isCharging = true;
+                chargeTimer.Reset();
+                rb.velocity = rb.velocity.y * Vector3.up;
+            }
+            else if(spaceDown){
+                bool maxCharge = chargeTimer.Update(Time.fixedDeltaTime);
+            }
+            else if(spaceRelease){
                 isAttacking = true;
+                isCharging = false;
+                attackLaunch = true;
                 rb.velocity = rb.velocity.y * Vector3.up;
             }
             else{
-                if(isAttacking){
+                if(isAttacking || isCharging){
                     rb.velocity = rb.velocity.y * Vector3.up;
                 }
                 else{
+
                     //mvt latéraux
-                    float latVelocity = x * speed;
+                    float latVelocity = axesInput.x * speed;
                     rb.velocity = latVelocity * Vector3.right + rb.velocity.y * Vector3.up;
+
                     //saut 
                     Vector3 dF = Vector3.zero;
-                    
-                    if(y > 0 && isGrounded){
+                    if(axesInput.y > 0 && isGrounded){
                         dF = Vector3.up * jumpSpeed * dt;
                     }
                     rb.AddForce(dF, ForceMode2D.Impulse);
                 }
             } 
             // On met à jour le sprite du personnage en fonction des inputs
-            gfx.UpdateGfx(isGrounded, rb.velocity.x , attackLaunch, ref isAttacking);
+            gfx.UpdateGfx(isGrounded, rb.velocity.x , attackLaunch,isCharging,chargeTimer, ref isAttacking);
+            // je passe isAttacking en ref pour le changer si l'annimation est fini, il y a probablement mieu
         }
     }
 }
