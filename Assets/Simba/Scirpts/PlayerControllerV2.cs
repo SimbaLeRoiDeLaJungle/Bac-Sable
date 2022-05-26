@@ -9,6 +9,8 @@ namespace Simba{
         [SerializeField] float speed;
         [SerializeField] float jumpSpeed;
         GroundChecker groundChecker;
+        bool isAttacking;
+        [SerializeField] GfxUpdater gfx;
         
         void Start()
         {
@@ -26,18 +28,36 @@ namespace Simba{
             float dt = Time.fixedDeltaTime; // temps entre 2 fixedUpdate
             float x = Input.GetAxisRaw("Horizontal");
             float y = Input.GetAxisRaw("Vertical");
-            //mvt latéraux
-            float latVelocity = x * speed;
-            rb.velocity = latVelocity * Vector3.right + rb.velocity.y * Vector3.up;
-            //saut 
-            Vector3 dF = Vector3.zero;
-            if(y > 0){
-                bool isGrounded = groundChecker.CheckGroundContact();
-                if(isGrounded){
-                    dF = Vector3.up * jumpSpeed * dt;
+            bool attackInput = Input.GetKeyDown(KeyCode.Space);
+            bool isGrounded = groundChecker.CheckGroundContact();
+            
+            bool attackLaunch = false;
+            if(attackInput){
+                if(!isAttacking){
+                    attackLaunch = true;
                 }
+                isAttacking = true;
+                rb.velocity = rb.velocity.y * Vector3.up;
             }
-            rb.AddForce(dF, ForceMode2D.Impulse);
+            else{
+                if(isAttacking){
+                    rb.velocity = rb.velocity.y * Vector3.up;
+                }
+                else{
+                    //mvt latéraux
+                    float latVelocity = x * speed;
+                    rb.velocity = latVelocity * Vector3.right + rb.velocity.y * Vector3.up;
+                    //saut 
+                    Vector3 dF = Vector3.zero;
+                    
+                    if(y > 0 && isGrounded){
+                        dF = Vector3.up * jumpSpeed * dt;
+                    }
+                    rb.AddForce(dF, ForceMode2D.Impulse);
+                }
+            } 
+            // On met à jour le sprite du personnage en fonction des inputs
+            gfx.UpdateGfx(isGrounded, rb.velocity.x , attackLaunch, ref isAttacking);
         }
     }
 }
